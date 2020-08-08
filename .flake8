@@ -1,0 +1,10 @@
+[flake8]
+max-line-length = 100
+docstring-quotes = """
+multiline-quotes = """
+inline-quotes = "
+docstring-convention=google
+ignore = W503,
+         E203,
+         A003,
+         D1
