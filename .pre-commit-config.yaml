@@ -1,6 +1,11 @@
 repos:
 -   repo: local
     hooks:
+    -   id: export_schema
+        name: Update GraphQL schema
+        entry: poetry run update_schema
+        language: python
+        types: [python]
     -   id: isort
         name: Running isort
         entry: isort
