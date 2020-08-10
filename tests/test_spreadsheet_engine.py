@@ -1,5 +1,66 @@
-from spreadsheet_engine import __version__
+import pytest
+from graphene.test import Client
+from spreadsheet_engine.main import root_schema
 
 
-def test_version():
-    assert __version__ == "0.1.0"
+@pytest.fixture
+def client() -> Client:
+    return Client(root_schema)
+
+
+def test_type_detection(client):
+    query = """
+    query calculate($table: TableInput!) {
+      calculate(table: $table) {
+        cells {
+          row
+          column
+          input
+          output
+          type
+        }
+      }
+    }
+    """
+    variables = {
+        "table": {
+            "cells": [
+                {"row": 1, "column": 2, "value": "lolwut"},
+                {"row": 1, "column": 2, "value": "12"},
+                {"row": 1, "column": 2, "value": "lambda: 12"},
+            ]
+        }
+    }
+    result = client.execute(query, variable_values=variables)
+
+    assert "errors" not in result
+
+    assert result == {
+        "data": {
+            "calculate": {
+                "cells": [
+                    {
+                        "row": 1,
+                        "column": 2,
+                        "input": "lolwut",
+                        "output": "lolwut",
+                        "type": "TEXT",
+                    },
+                    {
+                        "row": 1,
+                        "column": 2,
+                        "input": "12",
+                        "output": "12",
+                        "type": "NUMBER",
+                    },
+                    {
+                        "row": 1,
+                        "column": 2,
+                        "input": "lambda: 12",
+                        "output": "lambda: 12",
+                        "type": "FORMULA",
+                    },
+                ]
+            }
+        }
+    }

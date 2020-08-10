@@ -49,3 +49,13 @@ indent = 4
 line_length = 88
 multi_line_output = 3  # Vertical Hanging Indent
 include_trailing_comma = true
+
+[tool.coverage.run]
+branch = true
+parallel = true
+source = ["spreadsheet_engine/"]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+fail_under = 95
+omit = ["spreadsheet_engine/cli.py", "spreadsheet_engine/__main__.py"]

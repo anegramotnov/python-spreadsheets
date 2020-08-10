@@ -30,7 +30,7 @@ repos:
         types: [python]
     -   id: pytest-cov
         name: Running pytest with coverage
-        entry: pytest --cov
+        entry: pytest --cov --disable-warnings
         language: python
         always_run: true
         pass_filenames: false

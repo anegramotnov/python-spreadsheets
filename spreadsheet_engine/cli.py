@@ -3,7 +3,7 @@ from pathlib import Path
 from spreadsheet_engine.main import root_schema
 
 
-def update_schema():
+def update_schema() -> None:
     schema_path = Path("schema.graphql")
 
     old_schema = ""
@@ -19,5 +19,5 @@ def update_schema():
         exit(1)
 
 
-def print_schema():
+def print_schema() -> None:
     print(root_schema)
