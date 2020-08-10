@@ -1,0 +1,35 @@
+schema {
+  query: Query
+}
+
+type Cell {
+  row: Int!
+  column: Int!
+  input: String!
+  output: String!
+  type: CellTypes!
+}
+
+input CellInput {
+  row: Int!
+  column: Int!
+  value: String!
+}
+
+enum CellTypes {
+  TEXT
+  NUMBER
+  FORMULA
+}
+
+type Query {
+  calculate(table: TableInput!): Table
+}
+
+type Table {
+  cells: [Cell!]!
+}
+
+input TableInput {
+  cells: [CellInput!]!
+}
