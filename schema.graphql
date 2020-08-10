@@ -23,13 +23,13 @@ enum CellTypes {
 }
 
 type Query {
-  calculate(table: TableInput!): Table
+  spreadsheet(spreadsheet: SpreadsheetInput!): Spreadsheet
 }
 
-type Table {
+type Spreadsheet {
   cells: [Cell!]!
 }
 
-input TableInput {
+input SpreadsheetInput {
   cells: [CellInput!]!
 }

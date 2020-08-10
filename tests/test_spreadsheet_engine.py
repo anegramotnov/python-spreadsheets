@@ -10,8 +10,8 @@ def client() -> Client:
 
 def test_type_detection(client):
     query = """
-    query calculate($table: TableInput!) {
-      calculate(table: $table) {
+    query calculate_spreadsheet($spreadsheet: SpreadsheetInput!) {
+      spreadsheet(spreadsheet: $spreadsheet) {
         cells {
           row
           column
@@ -23,7 +23,7 @@ def test_type_detection(client):
     }
     """
     variables = {
-        "table": {
+        "spreadsheet": {
             "cells": [
                 {"row": 1, "column": 2, "value": "lolwut"},
                 {"row": 1, "column": 2, "value": "12"},
@@ -37,7 +37,7 @@ def test_type_detection(client):
 
     assert result == {
         "data": {
-            "calculate": {
+            "spreadsheet": {
                 "cells": [
                     {
                         "row": 1,

@@ -26,9 +26,9 @@ class CellGrapheneInput(gn.InputObjectType):
     value = gn.NonNull(gn.String)
 
 
-class TableGrapheneInput(gn.InputObjectType):
+class SpreadsheetGrapheneInput(gn.InputObjectType):
     class Meta:
-        name = "TableInput"
+        name = "SpreadsheetInput"
 
     cells = gn.NonNull(gn.List(gn.NonNull(CellGrapheneInput)))
 
@@ -63,25 +63,27 @@ class CellGrapheneType(gn.ObjectType):
         return cell
 
 
-class TableGrapheneType(gn.ObjectType):
+class SpreadsheetGrapheneType(gn.ObjectType):
     class Meta:
-        name = "Table"
+        name = "Spreadsheet"
 
     cells = gn.NonNull(gn.List(gn.NonNull(CellGrapheneType)))
 
 
 class Query(gn.ObjectType):
-    calculate = gn.Field(TableGrapheneType, table=TableGrapheneInput(required=True))
+    spreadsheet = gn.Field(
+        SpreadsheetGrapheneType, spreadsheet=SpreadsheetGrapheneInput(required=True)
+    )
 
     @staticmethod
-    def resolve_calculate(
-        parent: None, info: ResolveInfo, table: TableGrapheneInput
-    ) -> TableGrapheneType:
+    def resolve_spreadsheet(
+        parent: None, info: ResolveInfo, spreadsheet: SpreadsheetGrapheneInput
+    ) -> SpreadsheetGrapheneType:
         output_cells: List[CellGrapheneType] = []
-        for cell in table.cells:
+        for cell in spreadsheet.cells:
             output_cells.append(CellGrapheneType.from_input(cell))
 
-        return TableGrapheneType(cells=output_cells)
+        return SpreadsheetGrapheneType(cells=output_cells)
 
 
 root_schema = gn.Schema(query=Query)
