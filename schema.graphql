@@ -1,5 +1,5 @@
 schema {
-  query: Query
+  mutation: SpreadsheetMutations
 }
 
 type Cell {
@@ -22,14 +22,14 @@ enum CellTypes {
   FORMULA
 }
 
-type Query {
-  spreadsheet(spreadsheet: SpreadsheetInput!): Spreadsheet
-}
-
 type Spreadsheet {
   cells: [Cell!]!
 }
 
 input SpreadsheetInput {
   cells: [CellInput!]!
+}
+
+type SpreadsheetMutations {
+  calculateSpreadsheet(inputSpreadsheet: SpreadsheetInput): Spreadsheet
 }

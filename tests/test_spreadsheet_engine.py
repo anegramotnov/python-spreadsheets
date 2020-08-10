@@ -10,8 +10,8 @@ def client() -> Client:
 
 def test_type_detection(client):
     query = """
-    query calculate_spreadsheet($spreadsheet: SpreadsheetInput!) {
-      spreadsheet(spreadsheet: $spreadsheet) {
+    mutation calculateSpreadsheet($spreadsheet: SpreadsheetInput!) {
+      calculateSpreadsheet(inputSpreadsheet: $spreadsheet) {
         cells {
           row
           column
@@ -37,7 +37,7 @@ def test_type_detection(client):
 
     assert result == {
         "data": {
-            "spreadsheet": {
+            "calculateSpreadsheet": {
                 "cells": [
                     {
                         "row": 1,

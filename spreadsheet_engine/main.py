@@ -70,23 +70,28 @@ class SpreadsheetGrapheneType(gn.ObjectType):
     cells = gn.NonNull(gn.List(gn.NonNull(CellGrapheneType)))
 
 
-class Query(gn.ObjectType):
-    spreadsheet = gn.Field(
-        SpreadsheetGrapheneType, spreadsheet=SpreadsheetGrapheneInput(required=True)
-    )
+class CalculateSpreadsheet(gn.Mutation):
+    class Arguments:
+        input_spreadsheet = SpreadsheetGrapheneInput()
+
+    Output = SpreadsheetGrapheneType
 
     @staticmethod
-    def resolve_spreadsheet(
-        parent: None, info: ResolveInfo, spreadsheet: SpreadsheetGrapheneInput
-    ) -> SpreadsheetGrapheneType:
+    def mutate(
+        root: None, info: ResolveInfo, input_spreadsheet: SpreadsheetGrapheneInput
+    ) -> "SpreadsheetGrapheneType":
         output_cells: List[CellGrapheneType] = []
-        for cell in spreadsheet.cells:
+        for cell in input_spreadsheet.cells:
             output_cells.append(CellGrapheneType.from_input(cell))
 
         return SpreadsheetGrapheneType(cells=output_cells)
 
 
-root_schema = gn.Schema(query=Query)
+class SpreadsheetMutations(gn.ObjectType):
+    calculate_spreadsheet = CalculateSpreadsheet.Field()
+
+
+root_schema = gn.Schema(mutation=SpreadsheetMutations)
 
 routes = [Route("/graphql", GraphQLApp(schema=root_schema))]
 
