@@ -28,6 +28,7 @@ repos:
         entry: mypy
         language: python
         types: [python]
+        require_serial: true
     -   id: pytest-cov
         name: Running pytest with coverage
         entry: pytest --cov --disable-warnings
