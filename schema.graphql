@@ -4,7 +4,7 @@ schema {
 
 type Cell {
   row: Int!
-  column: Int!
+  column: String!
   input: String!
   output: String!
   type: CellTypes!
@@ -12,7 +12,7 @@ type Cell {
 
 input CellInput {
   row: Int!
-  column: Int!
+  column: String!
   value: String!
 }
 

@@ -1,6 +1,6 @@
 import pytest
 from graphene.test import Client
-from spreadsheet_engine.main import root_schema
+from spreadsheet_engine.api import root_schema
 
 
 @pytest.fixture
@@ -8,7 +8,7 @@ def client() -> Client:
     return Client(root_schema)
 
 
-def test_type_detection(client):
+def test_calculate_format(client):
     query = """
     mutation calculateSpreadsheet($spreadsheet: SpreadsheetInput!) {
       calculateSpreadsheet(inputSpreadsheet: $spreadsheet) {
@@ -22,15 +22,8 @@ def test_type_detection(client):
       }
     }
     """
-    variables = {
-        "spreadsheet": {
-            "cells": [
-                {"row": 1, "column": 2, "value": "lolwut"},
-                {"row": 1, "column": 2, "value": "12"},
-                {"row": 1, "column": 2, "value": "lambda: 12"},
-            ]
-        }
-    }
+    variables = {"spreadsheet": {"cells": [{"row": 1, "column": "A", "value": "test"}]}}
+
     result = client.execute(query, variable_values=variables)
 
     assert "errors" not in result
@@ -41,26 +34,40 @@ def test_type_detection(client):
                 "cells": [
                     {
                         "row": 1,
-                        "column": 2,
-                        "input": "lolwut",
-                        "output": "lolwut",
+                        "column": "A",
+                        "input": "test",
+                        "output": "test",
                         "type": "TEXT",
-                    },
-                    {
-                        "row": 1,
-                        "column": 2,
-                        "input": "12",
-                        "output": "12",
-                        "type": "NUMBER",
-                    },
-                    {
-                        "row": 1,
-                        "column": 2,
-                        "input": "lambda: 12",
-                        "output": "lambda: 12",
-                        "type": "FORMULA",
                     },
                 ]
             }
         }
     }
+
+
+def test_cell_duplicate(client):
+    query = """
+    mutation calculateSpreadsheet($spreadsheet: SpreadsheetInput!) {
+      calculateSpreadsheet(inputSpreadsheet: $spreadsheet) {
+        cells {
+          row
+          column
+        }
+      }
+    }
+    """
+    variables = {
+        "spreadsheet": {
+            "cells": [
+                {"row": 1, "column": "A", "value": "test"},
+                {"row": 1, "column": "A", "value": "test 2"},
+            ]
+        }
+    }
+
+    result = client.execute(query, variable_values=variables)
+
+    assert (
+        result["errors"][0]["message"]
+        == "Error while adding cell #1: Cell A1 already exists"
+    )
