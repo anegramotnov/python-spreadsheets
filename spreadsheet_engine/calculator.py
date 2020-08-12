@@ -12,16 +12,15 @@ class CellTypes(Enum):
 class Cell(NamedTuple):
     row: int
     column: str
-    type: CellTypes
     input: str
 
 
 class CalculatedCell(NamedTuple):
     row: int
     column: str
-    type: CellTypes
     input: str
     output: str
+    type: CellTypes
 
 
 class RowHelper:
@@ -106,7 +105,7 @@ class Spreadsheet:
 
     _row_helper: RowHelper
     _column_helper: ColumnHelper
-    _cell_type_helper: CellHelper
+    _cell_helper: CellHelper
 
     def __init__(self, rows: int, columns: int):
         self._row_helper = RowHelper(rows=rows)
@@ -122,9 +121,7 @@ class Spreadsheet:
         self._column_helper.validate_column(column=column)
         self._row_helper.validate_row(row=row)
 
-        cell_type = self._cell_helper.get_type(value=value)
-
-        return Cell(row=row, column=column, input=value, type=cell_type)
+        return Cell(row=row, column=column, input=value)
 
     def add_cell(self, row: int, column: str, value: str) -> None:
         cell = self._get_cell(row=row, column=column, value=value)
@@ -135,9 +132,6 @@ class Spreadsheet:
             raise ValueError(f"Cell {column}{row} already exists")
         else:
             self._cells_map[row][column] = cell
-
-        if cell.type == CellTypes.FORMULA:
-            self._formula_cells.append(cell)
 
     @property
     def cells(self) -> Iterator[Cell]:
@@ -152,7 +146,8 @@ class Spreadsheet:
 
     def calculate(self) -> None:
         for cell in self.cells:
+            cell_type = self._cell_helper.get_type(value=cell.input)
             calculated_cell = CalculatedCell(  # type: ignore[misc]
-                **cell._asdict(), output=cell.input
+                **cell._asdict(), output=cell.input, type=cell_type
             )
             self._calculated_cells.append(calculated_cell)
