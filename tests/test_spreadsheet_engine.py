@@ -22,7 +22,14 @@ def test_calculate_format(client):
       }
     }
     """
-    variables = {"spreadsheet": {"cells": [{"row": 1, "column": "A", "value": "test"}]}}
+    variables = {
+        "spreadsheet": {
+            "cells": [
+                {"row": 1, "column": "A", "value": "test"},
+                {"row": 2, "column": "B", "value": "lambda: None"},
+            ]
+        }
+    }
 
     result = client.execute(query, variable_values=variables)
 
@@ -38,6 +45,13 @@ def test_calculate_format(client):
                         "input": "test",
                         "output": "test",
                         "type": "TEXT",
+                    },
+                    {
+                        "row": 2,
+                        "column": "B",
+                        "input": "lambda: None",
+                        "output": "lambda: None",
+                        "type": "FORMULA",
                     },
                 ]
             }

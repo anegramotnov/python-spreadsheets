@@ -1,6 +1,8 @@
+import string
 from enum import Enum, auto
-from string import ascii_uppercase
 from typing import Dict, Iterator, List, NamedTuple, Set
+
+COLUMN_ALPHABET = string.ascii_uppercase
 
 
 class CellTypes(Enum):
@@ -46,7 +48,7 @@ class ColumnHelper:
         }
 
     def validate_column(self, column: str) -> None:
-        if not column or not all(c in ascii_uppercase for c in column):
+        if not column or not all(c in COLUMN_ALPHABET for c in column):
             raise ValueError(f"Column '{column}' not in valid format ([A-Z]+)")
         if column not in self._allowed_columns:
             max_column = self.get_column_by_number(self._max_column_number)
@@ -61,8 +63,8 @@ class ColumnHelper:
     def get_number_by_column(self, column: str) -> int:
         result = 0
         for char in column:
-            result *= len(ascii_uppercase)
-            result += ascii_uppercase.index(char) + 1
+            result *= len(COLUMN_ALPHABET)
+            result += COLUMN_ALPHABET.index(char) + 1
 
         return result
 
@@ -70,8 +72,8 @@ class ColumnHelper:
 
         letters = []
         while number:
-            number, reminder = divmod(number - 1, len(ascii_uppercase))
-            letters.append(ascii_uppercase[reminder])
+            number, reminder = divmod(number - 1, len(COLUMN_ALPHABET))
+            letters.append(COLUMN_ALPHABET[reminder])
 
         result = "".join(reversed(letters))
 
@@ -147,7 +149,17 @@ class Spreadsheet:
     def calculate(self) -> None:
         for cell in self.cells:
             cell_type = self._cell_helper.get_type(value=cell.input)
-            calculated_cell = CalculatedCell(  # type: ignore[misc]
-                **cell._asdict(), output=cell.input, type=cell_type
+
+            if cell_type == CellTypes.FORMULA:
+                self._formula_cells.append(cell)
+            else:
+                calculated_cell = CalculatedCell(  # type: ignore[misc]
+                    **cell._asdict(), output=cell.input, type=cell_type
+                )
+                self._calculated_cells.append(calculated_cell)
+
+        for formula in self._formula_cells:
+            calculated_formula = CalculatedCell(  # type: ignore[misc]
+                **formula._asdict(), output=formula.input, type=CellTypes.FORMULA
             )
-            self._calculated_cells.append(calculated_cell)
+            self._calculated_cells.append(calculated_formula)
