@@ -3,7 +3,7 @@ requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
 
 [tool.poetry]
-name = "spreadsheet-engine"
+name = "python-spreadsheets"
 version = "0.1.0"
 description = ""
 authors = ["Aleksey Negramotnov <anegramotnov@gmail.com>"]
@@ -38,13 +38,13 @@ isort = "^5.3.2"
 astpretty = "^2.0.0"
 
 [tool.poetry.scripts]
-update_schema = "spreadsheet_engine.cli:update_schema"
-print_schema = "spreadsheet_engine.cli:print_schema"
+update_schema = "python_spreadsheets.cli:update_schema"
+print_schema = "python_spreadsheets.cli:print_schema"
 
 [tool.isort]
 default_section = "FIRSTPARTY"
 sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
-known_first_party = ["spreadsheet_engine"]
+known_first_party = ["python_spreadsheets"]
 atomic = true
 indent = 4
 line_length = 88
@@ -54,9 +54,9 @@ include_trailing_comma = true
 [tool.coverage.run]
 branch = true
 parallel = true
-source = ["spreadsheet_engine/"]
+source = ["python_spreadsheets/"]
 omit = ["tests/*"]
 
 [tool.coverage.report]
 fail_under = 95
-omit = ["spreadsheet_engine/cli.py", "spreadsheet_engine/__main__.py"]
+omit = ["python_spreadsheets/cli.py", "python_spreadsheets/__main__.py"]

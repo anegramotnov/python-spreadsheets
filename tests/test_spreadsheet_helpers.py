@@ -1,5 +1,5 @@
 import pytest
-from spreadsheet_engine.calculator import (
+from python_spreadsheets.calculator import (
     CellHelper,
     ColumnHelper,
     FormulaValue,

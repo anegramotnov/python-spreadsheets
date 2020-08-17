@@ -1,5 +1,5 @@
 import pytest
-from spreadsheet_engine.calculator import Spreadsheet
+from python_spreadsheets.calculator import Spreadsheet
 
 
 @pytest.fixture

@@ -1,6 +1,6 @@
 import pytest
 from graphene.test import Client
-from spreadsheet_engine.api import root_schema
+from python_spreadsheets.api import root_schema
 
 
 @pytest.fixture

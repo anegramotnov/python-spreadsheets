@@ -1,7 +1,7 @@
 import graphene as gn
 from graphql import GraphQLError, ResolveInfo
-from spreadsheet_engine.calculator import Spreadsheet
-from spreadsheet_engine.graphene_types import (
+from python_spreadsheets.calculator import Spreadsheet
+from python_spreadsheets.graphene_types import (
     CellGrapheneType,
     SpreadsheetGrapheneInput,
     SpreadsheetGrapheneType,

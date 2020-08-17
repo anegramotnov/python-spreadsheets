@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from spreadsheet_engine.api import root_schema
+from python_spreadsheets.api import root_schema
 
 
 def update_schema() -> None:
