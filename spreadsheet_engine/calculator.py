@@ -1,3 +1,4 @@
+import ast
 import string
 from typing import Callable, Dict, Iterator, List, NamedTuple, Optional, Set, Union
 
@@ -56,7 +57,7 @@ class ColumnHelper:
             raise ValueError(f"Column out of range (A-{max_column})")
 
     def validate_number(self, number: int) -> None:
-        if not 1 <= number < self._max_column_number:
+        if not (1 <= number < self._max_column_number):
             raise ValueError(
                 f"Column number out of range (1-{self._max_column_number})"
             )
@@ -81,7 +82,100 @@ class ColumnHelper:
         return result
 
 
+class FormulaHelper:
+    _allowed_literals = {ast.Num, ast.NameConstant}
+
+    _allowed_expressions = {
+        ast.BinOp,
+        ast.UnaryOp,
+        ast.IfExp,
+        ast.Call,
+        ast.Compare,
+    }
+
+    _bin_operators = {
+        ast.Add,
+        ast.Sub,
+        ast.Mult,
+        ast.Div,
+        ast.FloorDiv,
+        ast.Mod,
+        ast.Pow,
+    }
+
+    _unary_operators = {
+        ast.UAdd,
+        ast.USub,
+        ast.Not,
+        ast.Invert,
+    }
+
+    _bool_operators = {
+        ast.And,
+        ast.Or,
+    }
+
+    _compare_operators = {
+        ast.Eq,
+        ast.NotEq,
+        ast.Lt,
+        ast.LtE,
+        ast.Gt,
+        ast.GtE,
+        ast.Is,
+        ast.IsNot,
+        ast.In,  # ?
+        ast.NotIn,  # ?
+    }
+
+    _allowed_body_roots = _allowed_literals | _allowed_expressions
+
+    _allowed_body_nodes = (
+        _allowed_literals
+        | _allowed_expressions
+        | _bin_operators
+        | _unary_operators
+        | _compare_operators
+        | _allowed_literals
+    )
+
+    @classmethod
+    def validate(cls, source: str) -> None:
+        module = ast.parse(source)
+        body = module.body
+
+        if len(body) != 1:
+            raise ValueError("Source must contain only 1 expression")
+
+        expression = body[0]
+
+        if not isinstance(expression, ast.Expr):
+            raise ValueError(f"Source must contain expression but found {expression}")
+
+        lambda_ = expression.value
+
+        if not isinstance(lambda_, ast.Lambda):
+            raise ValueError(f"Source must contain lambda but found {lambda_}")
+
+        if lambda_.args.args:
+            raise ValueError("Lambda must not contain arguments")
+
+        lambda_body = lambda_.body
+
+        if type(lambda_body) not in cls._allowed_body_roots:
+            raise ValueError(
+                f"Lambda body must be one of {cls._allowed_body_roots}, "
+                f"but found {lambda_body}"
+            )
+
+        for node in ast.walk(lambda_body):
+            if type(node) not in cls._allowed_body_nodes:
+                raise ValueError(f"Found forbidden node in lambda body: {node}")
+
+
 class CellHelper:
+    _formula_helper = FormulaHelper
+
     @staticmethod
     def get_float_or_none(value: str) -> Optional[float]:
         try:
@@ -90,15 +184,15 @@ class CellHelper:
         except ValueError:
             return None
 
-    @staticmethod
-    def get_callable_or_none(value: str) -> Optional[Callable]:
-        if not value.startswith("lambda:"):
-            return None
+    @classmethod
+    def get_callable_or_none(cls, value: str) -> Optional[Callable]:
         try:
-            formula = eval(value)
-            return formula
-        except SyntaxError:
+            cls._formula_helper.validate(value)
+        except (ValueError, SyntaxError):
             return None
+
+        formula = eval(value, {}, {})
+        return formula
 
     @classmethod
     def get_calculated_cell(cls, cell: InputCell) -> CalculatedCell:
@@ -108,8 +202,8 @@ class CellHelper:
             return CalculatedCell(  # type: ignore[misc]
                 **cell._asdict(), output=cell.input, value=NumberValue(number)
             )
-        formula = cls.get_callable_or_none(cell.input)
 
+        formula = cls.get_callable_or_none(cell.input)
         if formula:
             result = formula()
             return CalculatedCell(  # type: ignore[misc]
