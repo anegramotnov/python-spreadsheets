@@ -1,5 +1,11 @@
 import pytest
-from spreadsheet_engine.calculator import CellHelper, CellTypes, ColumnHelper
+from spreadsheet_engine.calculator import (
+    CellHelper,
+    ColumnHelper,
+    FormulaValue,
+    InputCell,
+    NumberValue,
+)
 
 column_number_pairs = (
     ("A", 1),
@@ -33,15 +39,19 @@ def test_incorrect_column_numbers(number):
 
 
 cells_types_pairs = (
-    ("lambda ...", CellTypes.FORMULA),
-    ("123", CellTypes.NUMBER),
-    (".1", CellTypes.NUMBER),
-    ("100.123", CellTypes.NUMBER),
-    ("Test", CellTypes.TEXT),
-    ("def test():\n  print('test')", CellTypes.TEXT),
+    ("lambda: 2 + 2", FormulaValue),
+    ("lambda: (2 + 2) * 2", FormulaValue),
+    ("123", NumberValue),
+    (".1", NumberValue),
+    ("100.123", NumberValue),
+    ("lambda ...", type(None)),
+    ("Test", type(None)),
+    ("def test():\n  print('test')", type(None)),
 )
 
 
-@pytest.mark.parametrize("cell, cell_type", cells_types_pairs)
-def test_type_detection(cell, cell_type):
-    assert CellHelper.get_type(cell) == cell_type
+@pytest.mark.parametrize("input_value, value_type", cells_types_pairs)
+def test_type_detection(input_value, value_type):
+    input_cell = InputCell(column="A", row=1, input=input_value)
+    calculated_cell = CellHelper.get_calculated_cell(input_cell)
+    assert type(calculated_cell.value) == value_type

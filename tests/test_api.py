@@ -17,7 +17,6 @@ def test_calculate_format(client):
           column
           input
           output
-          type
         }
       }
     }
@@ -39,19 +38,12 @@ def test_calculate_format(client):
         "data": {
             "calculateSpreadsheet": {
                 "cells": [
-                    {
-                        "row": 1,
-                        "column": "A",
-                        "input": "test",
-                        "output": "test",
-                        "type": "TEXT",
-                    },
+                    {"row": 1, "column": "A", "input": "test", "output": "test"},
                     {
                         "row": 2,
                         "column": "B",
                         "input": "lambda: None",
-                        "output": "lambda: None",
-                        "type": "FORMULA",
+                        "output": "None",
                     },
                 ]
             }

@@ -1,7 +1,4 @@
 import graphene as gn
-from spreadsheet_engine.calculator import CellTypes
-
-CellTypesGraphene = gn.Enum.from_enum(CellTypes)
 
 
 class CellGrapheneInput(gn.InputObjectType):
@@ -28,7 +25,6 @@ class CellGrapheneType(gn.ObjectType):
     column = gn.NonNull(gn.String)
     input = gn.NonNull(gn.String)
     output = gn.NonNull(gn.String)
-    type = gn.NonNull(CellTypesGraphene)
 
 
 class SpreadsheetGrapheneType(gn.ObjectType):

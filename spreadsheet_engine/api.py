@@ -25,11 +25,11 @@ class CalculateSpreadsheet(gn.Mutation):
         root: None, info: ResolveInfo, input_spreadsheet: SpreadsheetGrapheneInput
     ) -> "SpreadsheetGrapheneType":
 
-        spreadsheet = Spreadsheet(rows=DEFAULT_ROW_COUNT, columns=DEFAULT_COLUMN_COUNT)
+        spreadsheet = Spreadsheet(columns=DEFAULT_COLUMN_COUNT, rows=DEFAULT_ROW_COUNT)
 
         for cell_index, cell in enumerate(input_spreadsheet.cells):
             try:
-                spreadsheet.add_cell(row=cell.row, column=cell.column, value=cell.value)
+                spreadsheet.add_cell(column=cell.column, row=cell.row, value=cell.value)
             except ValueError as e:
                 raise GraphQLError(
                     message=f"Error while adding cell #{cell_index}: {e}",
@@ -39,11 +39,7 @@ class CalculateSpreadsheet(gn.Mutation):
 
         calculated_cells = (
             CellGrapheneType(
-                row=cell.row,
-                column=cell.column,
-                type=cell.type,
-                input=cell.input,
-                output=cell.output,
+                row=cell.row, column=cell.column, input=cell.input, output=cell.output,
             )
             for cell in spreadsheet.calculated_cells
         )

@@ -1,28 +1,29 @@
 import string
-from enum import Enum, auto
-from typing import Dict, Iterator, List, NamedTuple, Set
+from typing import Callable, Dict, Iterator, List, NamedTuple, Optional, Set, Union
 
 COLUMN_ALPHABET = string.ascii_uppercase
 
 
-class CellTypes(Enum):
-    TEXT = auto()
-    NUMBER = auto()
-    FORMULA = auto()
-
-
-class Cell(NamedTuple):
-    row: int
+class InputCell(NamedTuple):
     column: str
+    row: int
     input: str
+
+
+class NumberValue(NamedTuple):
+    value: float
+
+
+class FormulaValue(NamedTuple):
+    value: float
 
 
 class CalculatedCell(NamedTuple):
-    row: int
     column: str
+    row: int
     input: str
     output: str
-    type: CellTypes
+    value: Union[None, NumberValue, FormulaValue] = None
 
 
 class RowHelper:
@@ -82,50 +83,72 @@ class ColumnHelper:
 
 class CellHelper:
     @staticmethod
-    def is_float(value: str) -> bool:
+    def get_float_or_none(value: str) -> Optional[float]:
         try:
-            float(value)
-            return True
+            number = float(value)
+            return number
         except ValueError:
-            return False
+            return None
+
+    @staticmethod
+    def get_callable_or_none(value: str) -> Optional[Callable]:
+        if not value.startswith("lambda:"):
+            return None
+        try:
+            formula = eval(value)
+            return formula
+        except SyntaxError:
+            return None
 
     @classmethod
-    def get_type(cls, value: str) -> CellTypes:
-        if cls.is_float(value):
-            return CellTypes.NUMBER
-        elif value.startswith("lambda"):
-            return CellTypes.FORMULA
-        else:
-            return CellTypes.TEXT
+    def get_calculated_cell(cls, cell: InputCell) -> CalculatedCell:
+
+        number = cls.get_float_or_none(cell.input)
+        if number:
+            return CalculatedCell(  # type: ignore[misc]
+                **cell._asdict(), output=cell.input, value=NumberValue(number)
+            )
+        formula = cls.get_callable_or_none(cell.input)
+
+        if formula:
+            result = formula()
+            return CalculatedCell(  # type: ignore[misc]
+                **cell._asdict(), output=str(result), value=FormulaValue(result)
+            )
+
+        return CalculatedCell(**cell._asdict(), output=cell.input)  # type: ignore[misc]
 
 
 class Spreadsheet:
-    _cells_map: Dict[int, Dict[str, Cell]]
-    _formula_cells: List[Cell]
+    _cells_map: Dict[int, Dict[str, InputCell]]
+    _formula_cells: List[InputCell]
 
     _calculated_cells: List[CalculatedCell]
 
-    _row_helper: RowHelper
     _column_helper: ColumnHelper
+    _row_helper: RowHelper
+
     _cell_helper: CellHelper
 
-    def __init__(self, rows: int, columns: int):
-        self._row_helper = RowHelper(rows=rows)
+    def __init__(self, columns: int, rows: int):
         self._column_helper = ColumnHelper(columns=columns)
+        self._row_helper = RowHelper(rows=rows)
+
         self._cell_helper = CellHelper()
 
         self._cells_map = {}
         self._formula_cells = []
         self._calculated_cells = []
 
-    def _get_cell(self, row: int, column: str, value: str) -> Cell:
+    def _get_cell(self, row: int, column: str, value: str) -> InputCell:  # TODO: rename
 
         self._column_helper.validate_column(column=column)
         self._row_helper.validate_row(row=row)
 
-        return Cell(row=row, column=column, input=value)
+        return InputCell(row=row, column=column, input=value)
 
-    def add_cell(self, row: int, column: str, value: str) -> None:
+    def add_cell(self, column: str, row: int, value: str) -> None:
+
         cell = self._get_cell(row=row, column=column, value=value)
 
         if row not in self._cells_map:
@@ -136,7 +159,7 @@ class Spreadsheet:
             self._cells_map[row][column] = cell
 
     @property
-    def cells(self) -> Iterator[Cell]:
+    def cells(self) -> Iterator[InputCell]:
         for _, row in self._cells_map.items():
             for _, cell in row.items():
                 yield cell
@@ -148,18 +171,5 @@ class Spreadsheet:
 
     def calculate(self) -> None:
         for cell in self.cells:
-            cell_type = self._cell_helper.get_type(value=cell.input)
-
-            if cell_type == CellTypes.FORMULA:
-                self._formula_cells.append(cell)
-            else:
-                calculated_cell = CalculatedCell(  # type: ignore[misc]
-                    **cell._asdict(), output=cell.input, type=cell_type
-                )
-                self._calculated_cells.append(calculated_cell)
-
-        for formula in self._formula_cells:
-            calculated_formula = CalculatedCell(  # type: ignore[misc]
-                **formula._asdict(), output=formula.input, type=CellTypes.FORMULA
-            )
-            self._calculated_cells.append(calculated_formula)
+            calculated_cell = self._cell_helper.get_calculated_cell(cell)
+            self._calculated_cells.append(calculated_cell)

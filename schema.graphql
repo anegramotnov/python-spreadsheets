@@ -7,19 +7,12 @@ type Cell {
   column: String!
   input: String!
   output: String!
-  type: CellTypes!
 }
 
 input CellInput {
   row: Int!
   column: String!
   value: String!
-}
-
-enum CellTypes {
-  TEXT
-  NUMBER
-  FORMULA
 }
 
 type Spreadsheet {
