@@ -3,8 +3,8 @@ schema {
 }
 
 type Cell {
-  row: Int!
   column: String!
+  row: Int!
   input: String!
   output: String!
 }

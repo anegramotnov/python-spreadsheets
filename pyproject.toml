@@ -38,8 +38,8 @@ isort = "^5.3.2"
 astpretty = "^2.0.0"
 
 [tool.poetry.scripts]
-update_schema = "python_spreadsheets.cli:update_schema"
-print_schema = "python_spreadsheets.cli:print_schema"
+update_schema = "python_spreadsheets.api.cli:update_schema"
+print_schema = "python_spreadsheets.api.cli:print_schema"
 
 [tool.isort]
 default_section = "FIRSTPARTY"
@@ -59,4 +59,4 @@ omit = ["tests/*"]
 
 [tool.coverage.report]
 fail_under = 95
-omit = ["python_spreadsheets/cli.py", "python_spreadsheets/__main__.py"]
+omit = ["python_spreadsheets/api/cli.py", "python_spreadsheets/api/__main__.py"]

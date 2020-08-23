@@ -1,11 +1,11 @@
 import graphene as gn
 from graphql import GraphQLError, ResolveInfo
-from python_spreadsheets.calculator import Spreadsheet
-from python_spreadsheets.graphene_types import (
+from python_spreadsheets.api.graphene_types import (
     CellGrapheneType,
     SpreadsheetGrapheneInput,
     SpreadsheetGrapheneType,
 )
+from python_spreadsheets.engine.spreadsheet_calculator import SpreadsheetCalculator
 from starlette.applications import Starlette
 from starlette.graphql import GraphQLApp
 from starlette.routing import Route
@@ -25,7 +25,9 @@ class CalculateSpreadsheet(gn.Mutation):
         root: None, info: ResolveInfo, input_spreadsheet: SpreadsheetGrapheneInput
     ) -> "SpreadsheetGrapheneType":
 
-        spreadsheet = Spreadsheet(columns=DEFAULT_COLUMN_COUNT, rows=DEFAULT_ROW_COUNT)
+        spreadsheet = SpreadsheetCalculator(
+            columns_number=DEFAULT_COLUMN_COUNT, rows_number=DEFAULT_ROW_COUNT
+        )
 
         for cell_index, cell in enumerate(input_spreadsheet.cells):
             try:
@@ -39,9 +41,12 @@ class CalculateSpreadsheet(gn.Mutation):
 
         calculated_cells = (
             CellGrapheneType(
-                row=cell.row, column=cell.column, input=cell.input, output=cell.output,
+                column=cell_index.column,
+                row=cell_index.row,
+                input=cell.input,
+                output=cell.output,
             )
-            for cell in spreadsheet.calculated_cells
+            for cell_index, cell in spreadsheet.cells
         )
 
         return SpreadsheetGrapheneType(cells=calculated_cells)

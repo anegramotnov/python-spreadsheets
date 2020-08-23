@@ -21,8 +21,8 @@ class CellGrapheneType(gn.ObjectType):
     class Meta:
         name = "Cell"
 
-    row = gn.NonNull(gn.Int)
     column = gn.NonNull(gn.String)
+    row = gn.NonNull(gn.Int)
     input = gn.NonNull(gn.String)
     output = gn.NonNull(gn.String)
 

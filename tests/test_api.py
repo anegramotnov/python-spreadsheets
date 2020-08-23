@@ -1,6 +1,6 @@
 import pytest
 from graphene.test import Client
-from python_spreadsheets.api import root_schema
+from python_spreadsheets.api.application import root_schema
 
 
 @pytest.fixture
@@ -24,8 +24,8 @@ def test_calculate_format(client):
     variables = {
         "spreadsheet": {
             "cells": [
-                {"row": 1, "column": "A", "value": "test"},
-                {"row": 2, "column": "B", "value": "lambda: None"},
+                {"row": 1, "column": "a", "value": "test"},
+                {"row": 2, "column": "b", "value": "lambda: None"},
             ]
         }
     }
@@ -38,10 +38,10 @@ def test_calculate_format(client):
         "data": {
             "calculateSpreadsheet": {
                 "cells": [
-                    {"row": 1, "column": "A", "input": "test", "output": "test"},
+                    {"row": 1, "column": "a", "input": "test", "output": "test"},
                     {
                         "row": 2,
-                        "column": "B",
+                        "column": "b",
                         "input": "lambda: None",
                         "output": "None",
                     },
@@ -65,8 +65,8 @@ def test_cell_duplicate(client):
     variables = {
         "spreadsheet": {
             "cells": [
-                {"row": 1, "column": "A", "value": "test"},
-                {"row": 1, "column": "A", "value": "test 2"},
+                {"row": 1, "column": "a", "value": "test"},
+                {"row": 1, "column": "a", "value": "test 2"},
             ]
         }
     }
@@ -75,5 +75,5 @@ def test_cell_duplicate(client):
 
     assert (
         result["errors"][0]["message"]
-        == "Error while adding cell #1: Cell A1 already exists"
+        == "Error while adding cell #1: Cell a1 already exists"
     )
