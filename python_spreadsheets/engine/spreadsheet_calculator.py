@@ -1,4 +1,4 @@
-from typing import Dict, Iterator, List, Optional
+from typing import Dict, List, Optional
 
 from python_spreadsheets.engine.calculation_context import CalculationContext
 from python_spreadsheets.engine.formula_calculator import FormulaCalculator
@@ -6,7 +6,6 @@ from python_spreadsheets.engine.spreadsheet_helpers import CellHelper
 from python_spreadsheets.engine.types import (
     Cell,
     CellIndex,
-    CellWithIndex,
     ErrorValue,
     FormulaCell,
     NumberCell,
@@ -49,9 +48,8 @@ class SpreadsheetCalculator:
                 )
 
     @property
-    def cells(self) -> Iterator[CellWithIndex]:
-        for cell_index, cell in self._cells_map.items():
-            yield CellWithIndex(cell_index, cell)
+    def cells(self) -> Dict[CellIndex, Cell]:
+        return self._cells_map
 
     def get_cell(self, column: str, row: int) -> Optional[Cell]:
         cell = self._cells_map.get(CellIndex(column, row))

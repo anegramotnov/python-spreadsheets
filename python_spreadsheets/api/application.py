@@ -46,7 +46,7 @@ class CalculateSpreadsheet(gn.Mutation):
                 input=cell.input,
                 output=cell.output,
             )
-            for cell_index, cell in spreadsheet.cells
+            for cell_index, cell in spreadsheet.cells.items()
         )
 
         return SpreadsheetGrapheneType(cells=calculated_cells)

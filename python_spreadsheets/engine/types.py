@@ -30,11 +30,6 @@ class Cell:
     output: Union[Deferred, str]
 
 
-class CellWithIndex(NamedTuple):
-    cell_index: CellIndex
-    cell: Cell
-
-
 @dataclass
 class NumberCell(Cell):
     value: float
