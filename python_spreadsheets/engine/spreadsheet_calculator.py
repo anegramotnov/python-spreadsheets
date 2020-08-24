@@ -1,7 +1,10 @@
 from typing import Dict, List, Optional
 
 from python_spreadsheets.engine.calculation_context import CalculationContext
-from python_spreadsheets.engine.formula_calculator import FormulaCalculator
+from python_spreadsheets.engine.formula_calculator import (
+    FormulaCalculator,
+    FormulaError,
+)
 from python_spreadsheets.engine.spreadsheet_helpers import CellHelper
 from python_spreadsheets.engine.types import (
     Cell,
@@ -65,6 +68,6 @@ class SpreadsheetCalculator:
                         calculation_context=self._calculation_context,
                     )
                     formula.output = str(formula.value)
-                except Exception as e:
+                except FormulaError as e:
                     formula.value = ErrorValue()
                     formula.output = str(e)

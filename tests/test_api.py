@@ -25,7 +25,7 @@ def test_calculate_format(client):
         "spreadsheet": {
             "cells": [
                 {"row": 1, "column": "a", "value": "test"},
-                {"row": 2, "column": "b", "value": "lambda: None"},
+                {"row": 2, "column": "b", "value": "lambda: 1"},
             ]
         }
     }
@@ -39,12 +39,7 @@ def test_calculate_format(client):
             "calculateSpreadsheet": {
                 "cells": [
                     {"row": 1, "column": "a", "input": "test", "output": "test"},
-                    {
-                        "row": 2,
-                        "column": "b",
-                        "input": "lambda: None",
-                        "output": "None",
-                    },
+                    {"row": 2, "column": "b", "input": "lambda: 1", "output": "1.0"},
                 ]
             }
         }

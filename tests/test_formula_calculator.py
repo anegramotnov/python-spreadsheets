@@ -1,5 +1,9 @@
 import pytest
-from python_spreadsheets.engine.formula_calculator import FormulaCalculator
+from python_spreadsheets.engine.calculation_context import CalculationContext
+from python_spreadsheets.engine.formula_calculator import (
+    FormulaCalculator,
+    FormulaRuntimeError,
+)
 
 
 @pytest.mark.parametrize(
@@ -19,3 +23,10 @@ def test_formula_validation_error(source):
 
     with pytest.raises(ValueError):
         FormulaCalculator.validate(source=source, allowed_names={"test"})
+
+
+def test_formula_runtime_error():
+    with pytest.raises(FormulaRuntimeError):
+        FormulaCalculator.calculate(
+            source="lambda: None", calculation_context=CalculationContext()
+        )

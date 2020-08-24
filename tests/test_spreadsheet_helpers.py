@@ -74,7 +74,6 @@ def test_type_detection(input_value, value_type):
 valid_formula_with_variables = (
     ("lambda: 2 + 2", 4),
     ("lambda: 2 ** 2", 4),
-    ("lambda: None", None),  # it is valid case?
     ("lambda: 2", 2),
     ("lambda: (2 + 4) * 3", 18),
     ("lambda: a1 * 2", 4),

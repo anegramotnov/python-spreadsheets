@@ -20,7 +20,7 @@ def test_simple_formula(spreadsheet_calculator):
     cell = spreadsheet_calculator.get_cell("a", 1)
 
     assert cell.value == 4
-    assert cell.output == "4"
+    assert cell.output == "4.0"
 
 
 def test_related_formula(spreadsheet_calculator):

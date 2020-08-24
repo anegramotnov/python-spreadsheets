@@ -4,6 +4,14 @@ from typing import AbstractSet
 from python_spreadsheets.engine.calculation_context import CalculationContext
 
 
+class FormulaError(Exception):
+    pass
+
+
+class FormulaRuntimeError(FormulaError):
+    pass
+
+
 class FormulaCalculator:
     _allowed_literals = {ast.Num, ast.NameConstant}
 
@@ -77,9 +85,17 @@ class FormulaCalculator:
         global_variables = calculation_context.context
 
         function = eval(source, global_variables, {})
-        result = function()
+        try:
+            result = function()
+        except TypeError as e:
+            raise FormulaRuntimeError(f"Runtime error: {e}")
 
-        return result
+        try:
+            return float(result)
+        except TypeError:
+            raise FormulaRuntimeError(
+                f"Formula result must be a number, not {type(result)}"
+            )
 
     @classmethod
     def validate(cls, source: str, allowed_names: AbstractSet[str]) -> None:
